@@ -1,0 +1,165 @@
+#!/usr/bin/env ruby
+
+$:.unshift('lib')
+
+require 'eventmachine'
+require 'mc_proxy'
+
+$server_handler = nil
+$client_handler = nil
+
+class MessageLogger
+  
+  def log_message(packet)
+    puts packet.to_s
+    puts
+    puts "---------------------------"
+    puts
+  end
+  
+end
+
+$log = MessageLogger.new
+
+class Parser
+  
+  def initialize(message)
+    @destination = message[:destination]
+    @data = message[:message].dup
+    @packets = []
+  end
+  
+  def each_packet(&block)
+    can_parse = true
+    
+    while can_parse
+      packet = McProxy::Packets.parse(@data, @destination)
+
+      if packet
+        block.call(packet)
+        @data = @data.bytes.to_a[packet.bytesize..-1].pack("c*")
+      else
+        can_parse = false
+      end
+      
+    end
+    
+  rescue StandardError => se
+    puts "SE: #{se.message}\n#{se.backtrace.join("\n")}"
+    $client_handler.close_connection
+    $server_handler.close_connection
+  end
+  
+  def remaining_data?
+    @data.size > 0
+  end
+  
+  def remaining_data
+    @data
+  end
+  
+end
+
+class MessageQueue
+
+  def initialize()
+    @messages = []
+  end
+
+  def from_server(data)
+    puts "from_server"
+    @messages << { destination: "client", message: data }
+    self.process!
+  end
+  
+  def from_client(data)
+    puts "from_client"
+    @messages << { destination: "server", message: data }
+    self.process!
+  end
+
+  def process!
+    p = Parser.new(@messages[0])
+
+    p.each_packet do |packet|
+      puts "~=~=~=~=~=~=~=~=~=~=~=~="
+      puts "each_packet: #{packet.inspect}"
+      $log.log_message(packet)
+      if (packet.destination.to_sym == :server)
+        puts "Sending Data to Server"
+        $server_handler.send_data(packet.raw)
+      else
+        puts "Sending Data to CLIENT"
+        $client_handler.send_data(packet.raw)
+      end
+    end
+    
+    puts "Done with EACH PACKET"
+    puts "p.remaining_data: #{p.remaining_data.inspect}"
+
+    if p.remaining_data?
+      @messages[0][:message] = p.remaining_data
+    else
+      puts "SHIFT"
+      @messages.shift
+    end
+  end
+
+  # def flush!
+  #   while (!@messages.empty?)
+  #     packet = @messages.shift
+  #     
+  #     if (packet.destination == :server)
+  #       $server_handler.send_data(packet.raw)
+  #     else
+  #       $client_handler.send_data(packet.raw)
+  #     end
+  #     
+  #     $log.log_message(packet)
+  #   end
+  # end
+
+end
+
+$queue = MessageQueue.new()
+
+module ServerHandler
+  def post_init
+    $server_handler = self
+  end
+  
+  def receive_data( data )
+    puts "SH.receive_data: #{data.inspect}"
+    $queue.from_server(data)
+  end
+
+  # def unbind
+  #   # puts "-- someone disconnected from the echo server!"
+  # end
+end
+
+module ClientHandler
+ def post_init
+   $client_handler = self
+   EventMachine::connect('184.72.32.36', 25565, ServerHandler)
+ end
+
+ def receive_data( data )
+   puts "CH.receive_data: #{data.inspect}"   
+   $queue.from_client(data)
+ end
+
+ def unbind
+   puts "-- someone disconnected from the echo server!"
+   $server_handler.close_connection
+ end
+end
+
+#25565, '184.72.32.36
+
+puts "Listening for clients..."
+
+EventMachine::run {
+  EventMachine::start_server "127.0.0.1", 25565, ClientHandler
+}
+
