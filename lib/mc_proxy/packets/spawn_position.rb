@@ -1,7 +1,8 @@
 require 'mc_proxy/packets/base'
 
 module McProxy::Packets
-  class DestroyEntity < Base
-    SIZE = 5
+  class SpawnPosition < Base
+    SIZE = 13
+
   end
 end

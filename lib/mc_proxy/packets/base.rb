@@ -1,3 +1,5 @@
+require 'mc_proxy/parser'
+
 module McProxy::Packets
   class Base
     
@@ -6,13 +8,34 @@ module McProxy::Packets
     
     class << self
       def parse(data, destination)
-        new(destination, data)
+        if !self.schema_definition.nil?
+          p = McProxy::Parser.new(data)
+          p.parse(destination, &self.schema_definition)
+        
+          create(destination, p.parsed_raw, p.fields)
+        else
+          puts "No Definition for: #{self.inspect}"
+          puts "... but size is #{self::SIZE}"
+          create(destination, data[0...self::SIZE])
+        end
+      end
+
+      def create(destination, raw, fields={})
+        new(destination, raw, fields)
+      end
+
+      def schema(&block)
+        @schema_definition = block
+      end
+
+      def schema_definition
+        @schema_definition
       end
     end
     
     def initialize(destination, raw, fields={})
       @destination = destination
-      @raw = raw
+      @raw = raw.kind_of?(Array) ? raw.pack('c*') : raw
       
       fields.each_pair do |key, val|
         instance_variable_set(:"@#{key.to_s}", val)
@@ -29,6 +52,10 @@ module McProxy::Packets
     
     def bytesize
       @raw.bytesize
+    end
+
+    def destination_marker
+      (self.destination.to_sym == :server) ? 'S' : 'C'
     end
   
     def to_s

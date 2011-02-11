@@ -1,2 +1,5 @@
 .rvmrc
 .rspec
+.bundle
+.idea
+.yardoc

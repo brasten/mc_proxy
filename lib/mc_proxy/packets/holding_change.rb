@@ -1,7 +1,9 @@
 require 'mc_proxy/packets/base'
 
 module McProxy::Packets
-  class DestroyEntity < Base
-    SIZE = 5
+  class HoldingChange < Base
+    PACKET_ID = 16
+    SIZE = 3
+
   end
 end
