@@ -23,7 +23,7 @@ module McProxy
     #
     def initialize(data, offset=0)
       @data = data.kind_of?(String) ? data.bytes.to_a : data
-      @original_offset = @offset = 0
+      @original_offset = @offset = offset
       @raw = []
       @fields = {}
     end
@@ -32,7 +32,7 @@ module McProxy
       @definition= definition
       @destination = destination
       @fields = {}
-      parse_byte_field  # throw array packet_id
+      # @fields[:packet_id] = parse_byte_field  # throw array packet_id
       instance_eval(&definition)
     end
 
@@ -117,25 +117,25 @@ module McProxy
     end
 
     def parse_float_field
-      ensure_size!(32)
+      ensure_size!(4)
 
       offset_data = @data[@offset..-1].pack('c*')
-      val = FloatField.new(offset_data).value
-      @offset += 32
+      val = FloatStruct.new(offset_data).value
+      @offset += 4
       val
     end
 
     def parse_double_field
-      ensure_size!(64)
+      ensure_size!(8)
 
       offset_data = @data[@offset..-1].pack('c*')
-      val = DoubleField.new(offset_data).value
-      @offset += 64
+      val = DoubleStruct.new(offset_data).value
+      @offset += 8
       val
     end
 
     def parsed_raw
-      @data[@original_offset..@offset].pack('c*')
+      @data[@original_offset...@offset].pack('c*')
     end
 
     private
@@ -156,11 +156,11 @@ module McProxy
       signed :value, 64
     end
 
-    class FloatField < BitStruct
+    class FloatStruct < BitStruct
       float :value, 32
     end
 
-    class DoubleField < BitStruct
+    class DoubleStruct < BitStruct
       float :value, 64
     end
 

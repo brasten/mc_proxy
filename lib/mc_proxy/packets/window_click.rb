@@ -4,6 +4,7 @@ module McProxy::Packets
   class WindowClick < Base
     
     schema do
+      byte :packet_id
       byte :window_id
       short :slot
       byte :right_click

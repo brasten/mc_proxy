@@ -7,13 +7,14 @@ module McProxy::Packets
     attr_reader :mode
 
     schema do
+      byte :packet_id
       int :x
       int :z
       byte :mode
     end
 
     def to_s
-      puts "#{@mode ? 'Initializing' : 'Clearing'} #{@x}, #{@z}"
+      "<Prechunk mode=#{@mode ? 'Initializing' : 'Clearing'} x=#{@x}, z=#{@z}>\n  +-- size: #{self.bytesize}"
     end
   end
 end

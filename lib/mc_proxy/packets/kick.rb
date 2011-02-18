@@ -6,11 +6,13 @@ module McProxy::Packets
     attr_reader :reason
 
     schema do
+      byte :packet_id
       text :reason
     end
 
     def to_s
-      "KICKED! Because: #{self.reason}"
+      "<Kick reason=\"#{self.reason}\">" + 
+      "  +--> RAW: #{self.raw.inspect}"
     end
 
   end

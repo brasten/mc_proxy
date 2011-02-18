@@ -7,11 +7,14 @@ module McProxy::Packets
     attr_reader :message
     
     schema do
+      byte :packet_id
       text :message
     end
   
     def to_s
-      "Chat: #{self.message}"
+      "<ChatMessage message=\"#{self.message}\">" +
+      "  +--> RAW: #{self.raw.inspect}"
+      
     end
     
   end

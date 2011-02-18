@@ -11,14 +11,15 @@ module McProxy::Packets
     attr_reader :ground
 
     schema do
+      byte :packet_id
       double :x
-      if to_server?
-        double :stance
+      # if to_server?
+      #   double :stance
+      #   double :y
+      # else
         double :y
-      else
-        double :y
         double :stance
-      end
+      # end
       double :z
       float :yaw
       float :pitch
@@ -26,7 +27,9 @@ module McProxy::Packets
     end
 
     def to_s
-      puts "Player at #@x, #@z, #@x looking #@yaw x #@pitch"
+      "<PlayerPositionAndLook x=#@x y=#@y, stance=#@stance z=#@z yaw=#@yaw pitch=#@pitch ground=#@ground>" +
+      "\n  +-- RAW: #{self.raw.inspect}" + 
+      "\n  +-- size: #{self.bytesize}"
     end
   end
 end

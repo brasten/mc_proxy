@@ -15,6 +15,7 @@ module McProxy::Packets
   class MultiBlockChange < Base
 
     schema do
+      byte :packet_id
       int :x
       int :z
       short :array_count

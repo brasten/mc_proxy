@@ -4,6 +4,7 @@ module McProxy::Packets
   class UpdateSign < Base
     
     schema do
+      byte :packet_id
       int :x
       short :y
       int :z

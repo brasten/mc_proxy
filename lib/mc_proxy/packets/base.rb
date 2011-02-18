@@ -3,6 +3,7 @@ require 'mc_proxy/parser'
 module McProxy::Packets
   class Base
     
+    attr_reader :packet_id
     attr_reader :destination
     attr_reader :raw
     
@@ -14,8 +15,9 @@ module McProxy::Packets
         
           create(destination, p.parsed_raw, p.fields)
         else
-          puts "No Definition for: #{self.inspect}"
-          puts "... but size is #{self::SIZE}"
+          # puts "No Definition for: #{self.inspect}"
+          raise ::McProxy::NotEnoughDataError unless data.size >= self::SIZE
+          
           create(destination, data[0...self::SIZE])
         end
       end
@@ -46,9 +48,9 @@ module McProxy::Packets
       self.class.name
     end
 
-    def packet_id
-      @raw.bytes.to_a[0].to_s
-    end
+    # def packet_id
+    #   @raw.bytes.to_a[0].to_s
+    # end
     
     def bytesize
       @raw.bytesize
@@ -59,10 +61,7 @@ module McProxy::Packets
     end
   
     def to_s
-      puts "To     : #{self.destination.to_s}"
-      puts "Type   : #{self.type}"
-      puts "Type ID: #{self.packet_id}"
-      puts "RAW    : #{self.raw.inspect}"
+      "<#{self.type} raw=#{self.raw.inspect}>"
     end
   
   end

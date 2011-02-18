@@ -6,6 +6,7 @@ module McProxy::Packets
     attr_reader :entity_id
 
     schema do
+      byte :packet_id
       int :entity_id
     end
 

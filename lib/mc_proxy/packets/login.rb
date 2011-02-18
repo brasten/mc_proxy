@@ -19,6 +19,7 @@ module McProxy::Packets
     attr_accessor :field_one, :username, :password, :map_seed, :dimension
 
     schema do
+      byte :packet_id
       int :field_one
       text :username
       text :password
@@ -27,7 +28,9 @@ module McProxy::Packets
     end
 
     def to_s
-      "Login"
+      # self.inspect
+      "<Login packet_id=#{self.packet_id} field_one=#{self.field_one} username=\"#{self.username}\" password=\"#{self.password}\" map_seed=\"#{self.map_seed}\" dimension=#{self.dimension}>" +
+      "  +--> RAW: #{self.raw.inspect}"
     end
 
   end

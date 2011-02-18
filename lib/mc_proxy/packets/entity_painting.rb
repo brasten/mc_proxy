@@ -4,6 +4,7 @@ module McProxy::Packets
   class EntityPainting < Base
 
     schema do
+      byte :packet_id
       int :entity_id
       text :title
       int :x

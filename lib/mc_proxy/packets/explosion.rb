@@ -4,6 +4,7 @@ module McProxy::Packets
   class Explosion < Base
 
     schema do
+      byte :packet_id
       double :x
       double :y
       double :z

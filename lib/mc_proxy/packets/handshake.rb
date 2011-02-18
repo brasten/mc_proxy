@@ -20,6 +20,7 @@ module McProxy::Packets
     attr_reader :field_one
 
     schema do
+      byte :packet_id
       text :field_one
     end
 

@@ -9,6 +9,7 @@ module McProxy::Packets
     attr_reader :ground
 
     schema do
+      byte :packet_id
       double :x
       double :y
       double :stance
@@ -17,7 +18,7 @@ module McProxy::Packets
     end
 
     def to_s
-      puts "Player at #@x, #@z, #@x"
+      "Player at #@x, #@z, #@x"
     end
   end
 end

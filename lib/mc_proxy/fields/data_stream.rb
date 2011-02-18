@@ -17,7 +17,8 @@ module McProxy
           collected = []
 
           data[offset..-1].each do |byte|
-            if byte == 247
+            if byte == 127
+              collected << byte
               return new(collected.pack('c*'))
             else
               collected << byte
@@ -31,7 +32,7 @@ module McProxy
       # Total bytes of the string + 2 extra (length field)
       #
       def bytes_consumed
-        self.bytesize + 1
+        self.bytesize# + 1
       end
 
     end

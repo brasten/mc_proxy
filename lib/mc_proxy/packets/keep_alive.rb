@@ -12,11 +12,13 @@ module McProxy::Packets
     PACKET_ID = 0
 
     schema do
+      byte :packet_id
       # nothing
     end
 
     def to_s
-      "[#{self.destination_marker}] KeepAlive"
+      "<KeepAlive>" +
+      "  +--> RAW: #{self.raw.inspect}"
     end
 
   end

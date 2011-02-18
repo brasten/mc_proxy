@@ -90,8 +90,7 @@ module McProxy
       end
 
       def class_for(packet_id)
-        puts "class_for: #{packet_id}"
-        case packet_id.to_i
+        klass = case packet_id.to_i
         when 0
           KeepAlive
         when 1
@@ -192,9 +191,15 @@ module McProxy
           UpdateSign
         when 255
           Kick
-        else
-          KeepAlive
-        end          
+        end
+        
+        if klass.nil?
+          puts "###### No packet defined for: #{packet_id.to_i}"
+        # else
+        #   puts "Message: #{klass.name}"
+        end
+        
+        klass
       end
       
     end

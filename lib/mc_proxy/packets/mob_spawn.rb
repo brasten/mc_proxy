@@ -10,6 +10,7 @@ module McProxy::Packets
     attr_reader :metadata
 
     schema do
+      byte :packet_id
       int :entity_id
       byte :mob_type
       int :x
@@ -21,7 +22,7 @@ module McProxy::Packets
     end
 
     def to_s
-      puts "Spawning a #{@mob_type} mob at #{@x}, #{@y}, #{@z}..."
+      "<MobSpawn entity_id=#{self.entity_id} mob_type=#{@mob_type} x=#{@x}, y=#{@y}, z=#{@z} yaw=#{self.yaw} pitch=#{self.pitch} metadata=\"#{self.metadata.inspect}\">"
     end
 
   end

@@ -5,6 +5,7 @@ module McProxy::Packets
     PACKET_ID = 15
 
     schema do
+      byte :packet_id
       int :x
       byte :y
       int :z

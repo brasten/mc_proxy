@@ -2,8 +2,17 @@ require 'mc_proxy/packets/base'
 
 module McProxy::Packets
   class TimeUpdate < Base
-    PACKET_ID = 4
-    SIZE = 9
+    attr_reader :time
+
+    schema do
+      byte :packet_id
+      long :time
+    end
+
+    def to_s
+      "<TimeUpdate time=#{self.time}>"
+    end
+
 
   end
 end

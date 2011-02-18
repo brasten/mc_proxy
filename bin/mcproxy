@@ -5,18 +5,23 @@ $:.unshift('lib')
 require 'eventmachine'
 require 'mc_proxy'
 
+$logged_packets = [
+  McProxy::Packets::Login,
+  McProxy::Packets::MapChunk
+  ]
+
 $server_handler = nil
 $client_handler = nil
+
+# require 'fileutils'
+# FileUtils.mkdir_p('log')
+
+# $log_file = File.new("log/mcproxy-#{Time.now.to_i}.log", "w")
 
 class MessageLogger
   
   def log_message(packet)
-    if !(packet.class == McProxy::Packets::Base)
-      puts packet.to_s
-#      puts ""
-#      puts "---------------------------"
-#      puts ""
-    end
+    puts packet.to_s if $logged_packets.include?(packet.class)
   end
   
 end
@@ -36,9 +41,9 @@ class MessageQueue
   end
   
   def from_client(data)
-    @from_client.concat(data.bytes.to_a)
+    # @from_client.concat(data.bytes.to_a)
     $server_handler.send_data(data)
-    self.process!
+    # self.process!
   end
 
   def process!
@@ -47,7 +52,7 @@ class MessageQueue
     }
 
     @from_server = McProxy::Packets.each_packet(@from_server, 'client', &log_proc)
-    @from_client = McProxy::Packets.each_packet(@from_client, 'server', &log_proc)
+    # @from_client = McProxy::Packets.each_packet(@from_client, 'server', &log_proc)
   end
 
 end
